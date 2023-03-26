@@ -21,42 +21,66 @@ class Vampire {
 
   // Returns the number of vampires away from the original vampire this vampire is
   get numberOfVampiresFromOriginal() {
-    let numberFromOriginal = 0;
-    let currentVampire = this;
+    // let numberFromOriginal = 0;
+    // let currentVampire = this;
 
-    while (currentVampire.creator) {
-      currentVampire = currentVampire.creator;
-      numberFromOriginal++;
+    // while (currentVampire.creator) {
+    //   currentVampire = currentVampire.creator;
+    //   numberFromOriginal++;
+    // }
+
+    // return numberFromOriginal;
+    if(!this.creator) {
+      return 0;
     }
-
-    return numberFromOriginal;
+    return 1 + this.creator.numberOfVampiresFromOriginal;
   }
 
   // Returns true if this vampire is more senior than the other vampire. (Who is closer to the original vampire)
   isMoreSeniorThan(vampire) {
-    const currentVampireLevel = this.numberOfVampiresFromOriginal;
-    const compareVampireLevel = vampire.numberOfVampiresFromOriginal;
-    if (currentVampireLevel < compareVampireLevel) {
-      return true;
-    }
-    return false;
+    return this.numberOfVampiresFromOriginal < vampire.numberOfVampiresFromOriginal;
   }
 
   /** Tree traversal methods **/
 
   // Returns the vampire object with that name, or null if no vampire exists with that name
   vampireWithName(name) {
-    
+    if (!this) {
+      return null;
+    }
+    if (this.name === name) {
+      return this;
+    }
+
+    for (const offspring of this.offspring) {
+      return offspring.vampireWithName(name);
+    }
+    return null;
   }
 
   // Returns the total number of vampires that exist
   get totalDescendents() {
-    
+    let total = 0;
+    total += this.offspring.length;
+    for (const child of this.offspring) {
+      total += child.totalDescendents;
+    }
+    return total;
   }
 
   // Returns an array of all the vampires that were converted after 1980
   get allMillennialVampires() {
-    
+    let arrOfVampires = [];
+    if (this.yearConverted > 1980) {
+      arrOfVampires.push(this);
+    }
+
+    for(const child of this.offspring) {
+      const vampires = child.allMillennialVampires;
+      arrOfVampires = arrOfVampires.concat(vampires);
+    }
+
+    return arrOfVampires;
   }
 
 
